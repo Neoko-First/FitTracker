@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUserStore } from "@/stores/user-store";
 import { Calculator, Footprints, RotateCcw, Ruler } from "lucide-react";
 import Link from "next/link";
@@ -15,9 +16,12 @@ import { toast } from "sonner";
 export default function StepsPage() {
     const { height, customStrideLength, updateUser } = useUserStore();
 
-    // Calculator State
+    // Calculator State (Distance -> Steps)
     const [distanceStr, setDistanceStr] = useState("");
     const [unit, setUnit] = useState<"km" | "m">("km");
+
+    // Calculator State (Steps -> Distance)
+    const [stepsInputStr, setStepsInputStr] = useState("");
 
     // Calibration State
     const [calibDistanceStr, setCalibDistanceStr] = useState("");
@@ -33,13 +37,21 @@ export default function StepsPage() {
     const effectiveStride = customStrideLength || estimatedStride;
     const isCalibrated = !!customStrideLength;
 
-    // 3. Calculate Steps
-    let steps: number | null = null;
+    // 3. Calculate Steps (Distance -> Steps)
+    let stepsResult: number | null = null;
     const distanceVal = parseFloat(distanceStr.replace(",", "."));
 
     if (!isNaN(distanceVal) && distanceVal > 0 && effectiveStride) {
         const distanceInMeters = unit === "km" ? distanceVal * 1000 : distanceVal;
-        steps = Math.round(distanceInMeters / effectiveStride);
+        stepsResult = Math.round(distanceInMeters / effectiveStride);
+    }
+
+    // 4. Calculate Distance (Steps -> Distance)
+    let distanceResultMeters: number | null = null;
+    const stepsInputVal = parseInt(stepsInputStr.replace(/\s/g, ""), 10);
+
+    if (!isNaN(stepsInputVal) && stepsInputVal > 0 && effectiveStride) {
+        distanceResultMeters = stepsInputVal * effectiveStride;
     }
 
     // --- HANDLERS ---
@@ -71,77 +83,139 @@ export default function StepsPage() {
 
     const formatStride = (val: number) => (val * 100).toFixed(1) + " cm";
 
+    const formatDistanceResult = (meters: number) => {
+        if (meters >= 1000) {
+            return (meters / 1000).toFixed(2) + " km";
+        }
+        return Math.round(meters) + " m";
+    };
+
     return (
         <div className="w-full max-w-3xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
             {/* Header */}
             <div>
                 <h1 className="text-3xl font-bold tracking-tight mb-2">Calculateur de Pas</h1>
-                <p className="text-muted-foreground">Estimez votre nombre de pas en fonction de la distance parcourue.</p>
+                <p className="text-muted-foreground">Estimez vos pas ou votre distance parcourue.</p>
             </div>
 
             {/* Main Calculator Card */}
             <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-                <div className="p-6 space-y-6">
-                    {/* Input Section */}
-                    <div className="space-y-4">
-                        <Label htmlFor="distance">Distance à parcourir</Label>
-                        <div className="flex gap-2">
-                            <Input
-                                id="distance"
-                                type="number"
-                                placeholder="0"
-                                value={distanceStr}
-                                onChange={(e) => setDistanceStr(e.target.value)}
-                                className="text-lg"
-                            />
-                            <div className="flex rounded-md border bg-muted p-1">
-                                <button
-                                    onClick={() => setUnit("km")}
-                                    className={`px-3 py-1 rounded-sm text-sm font-medium transition-all ${
-                                        unit === "km" ? "bg-background shadow-sm" : "hover:bg-background/50"
-                                    }`}
-                                >
-                                    km
-                                </button>
-                                <button
-                                    onClick={() => setUnit("m")}
-                                    className={`px-3 py-1 rounded-sm text-sm font-medium transition-all ${
-                                        unit === "m" ? "bg-background shadow-sm" : "hover:bg-background/50"
-                                    }`}
-                                >
-                                    m
-                                </button>
-                            </div>
-                        </div>
+                <Tabs defaultValue="dist-to-steps" className="w-full">
+                    <div className="p-6 pb-0">
+                        <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
+                            <TabsTrigger value="dist-to-steps">Distance &rarr; Pas</TabsTrigger>
+                            <TabsTrigger value="steps-to-dist">Pas &rarr; Distance</TabsTrigger>
+                        </TabsList>
                     </div>
 
-                    {/* Result Section */}
-                    <div className="rounded-lg bg-primary/5 p-6 flex flex-col items-center justify-center min-h-[160px] relative overflow-hidden">
-                        {!effectiveStride ? (
-                            <div className="text-center space-y-3 z-10">
-                                <p className="text-muted-foreground">Configuration requise</p>
-                                <Link href="/profile">
-                                    <Button variant="outline">Renseigner ma taille</Button>
-                                </Link>
-                                <p className="text-xs text-muted-foreground mt-2">Nécessaire pour estimer votre foulée.</p>
+                    <div className="p-6 space-y-6">
+                        <TabsContent value="dist-to-steps" className="space-y-6 m-0">
+                            {/* Input Section */}
+                            <div className="space-y-4">
+                                <Label htmlFor="distance">Distance à parcourir</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        id="distance"
+                                        type="number"
+                                        placeholder="0"
+                                        value={distanceStr}
+                                        onChange={(e) => setDistanceStr(e.target.value)}
+                                        className="text-lg"
+                                    />
+                                    <div className="flex rounded-md border bg-muted p-1">
+                                        <button
+                                            onClick={() => setUnit("km")}
+                                            className={`px-3 py-1 rounded-sm text-sm font-medium transition-all ${
+                                                unit === "km" ? "bg-background shadow-sm" : "hover:bg-background/50"
+                                            }`}
+                                        >
+                                            km
+                                        </button>
+                                        <button
+                                            onClick={() => setUnit("m")}
+                                            className={`px-3 py-1 rounded-sm text-sm font-medium transition-all ${
+                                                unit === "m" ? "bg-background shadow-sm" : "hover:bg-background/50"
+                                            }`}
+                                        >
+                                            m
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        ) : steps !== null ? (
-                            <div className="text-center z-10 animate-in zoom-in-95 duration-300">
-                                <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Estimation</span>
-                                <div className="text-6xl font-black tracking-tighter text-primary mt-2">{steps.toLocaleString("fr-FR")}</div>
-                                <div className="text-lg text-primary/80 font-medium">pas</div>
-                            </div>
-                        ) : (
-                            <div className="text-center text-muted-foreground z-10">
-                                <Footprints className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                                <p>Entrez une distance pour commencer</p>
-                            </div>
-                        )}
 
-                        {/* Background Decor */}
-                        <Footprints className="absolute -bottom-8 -right-8 w-48 h-48 text-primary/5 rotate-[-15deg] pointer-events-none" />
+                            {/* Result Section */}
+                            <div className="rounded-lg bg-primary/5 p-6 flex flex-col items-center justify-center min-h-[160px] relative overflow-hidden">
+                                {!effectiveStride ? (
+                                    <div className="text-center space-y-3 z-10">
+                                        <p className="text-muted-foreground">Configuration requise</p>
+                                        <Link href="/profile">
+                                            <Button variant="outline">Renseigner ma taille</Button>
+                                        </Link>
+                                        <p className="text-xs text-muted-foreground mt-2">Nécessaire pour estimer votre foulée.</p>
+                                    </div>
+                                ) : stepsResult !== null ? (
+                                    <div className="text-center z-10 animate-in zoom-in-95 duration-300">
+                                        <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Estimation</span>
+                                        <div className="text-6xl font-black tracking-tighter text-primary mt-2">
+                                            {stepsResult.toLocaleString("fr-FR")}
+                                        </div>
+                                        <div className="text-lg text-primary/80 font-medium">pas</div>
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-muted-foreground z-10">
+                                        <Footprints className="w-12 h-12 mx-auto mb-2 opacity-20" />
+                                        <p>Entrez une distance pour commencer</p>
+                                    </div>
+                                )}
+                                {/* Background Decor */}
+                                <Footprints className="absolute -bottom-8 -right-8 w-48 h-48 text-primary/5 rotate-[-15deg] pointer-events-none" />
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="steps-to-dist" className="space-y-6 m-0">
+                            {/* Input Section */}
+                            <div className="space-y-4">
+                                <Label htmlFor="steps">Nombre de pas</Label>
+                                <Input
+                                    id="steps"
+                                    type="number"
+                                    placeholder="0"
+                                    value={stepsInputStr}
+                                    onChange={(e) => setStepsInputStr(e.target.value)}
+                                    className="text-lg"
+                                />
+                            </div>
+
+                            {/* Result Section */}
+                            <div className="rounded-lg bg-primary/5 p-6 flex flex-col items-center justify-center min-h-[160px] relative overflow-hidden">
+                                {!effectiveStride ? (
+                                    <div className="text-center space-y-3 z-10">
+                                        <p className="text-muted-foreground">Configuration requise</p>
+                                        <Link href="/profile">
+                                            <Button variant="outline">Renseigner ma taille</Button>
+                                        </Link>
+                                        <p className="text-xs text-muted-foreground mt-2">Nécessaire pour estimer votre foulée.</p>
+                                    </div>
+                                ) : distanceResultMeters !== null ? (
+                                    <div className="text-center z-10 animate-in zoom-in-95 duration-300">
+                                        <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Estimation</span>
+                                        <div className="text-6xl font-black tracking-tighter text-primary mt-2">
+                                            {formatDistanceResult(distanceResultMeters)}
+                                        </div>
+                                        <div className="text-lg text-primary/80 font-medium">parcourus</div>
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-muted-foreground z-10">
+                                        <Ruler className="w-12 h-12 mx-auto mb-2 opacity-20" />
+                                        <p>Entrez un nombre de pas pour commencer</p>
+                                    </div>
+                                )}
+                                {/* Background Decor */}
+                                <Ruler className="absolute -bottom-8 -right-8 w-48 h-48 text-primary/5 rotate-[-15deg] pointer-events-none" />
+                            </div>
+                        </TabsContent>
                     </div>
-                </div>
+                </Tabs>
 
                 {/* Footer / Stride Info */}
                 <div className="p-6 pt-0">
@@ -182,7 +256,7 @@ export default function StepsPage() {
                                     <SheetDescription>Pour une précision maximale, marchez une distance connue et comptez vos pas.</SheetDescription>
                                 </SheetHeader>
 
-                                <div className="grid gap-6 py-6">
+                                <div className="grid gap-6 py-6 px-4">
                                     <div className="space-y-2">
                                         <Label>Distance réelle parcourue (m)</Label>
                                         <Input

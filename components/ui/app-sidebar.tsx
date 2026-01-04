@@ -12,45 +12,51 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const data = {
-    navMain: [
-        {
-            title: "Steps",
-            url: "/steps",
-            icon: Footprints,
-        },
-        {
-            title: "Calories",
-            url: "/calories",
-            icon: Flame,
-        },
-        {
-            title: "BMI",
-            url: "/bmi",
-            icon: SquareActivity,
-        },
-        {
-            title: "Macros",
-            url: "/macros",
-            icon: Apple,
-            disabled: true,
-        },
-        {
-            title: "Hydratation",
-            url: "/hydration",
-            icon: GlassWater,
-            disabled: true,
-        },
-    ],
+type NavItem = {
+    title: string;
+    url: string;
+    icon: React.ComponentType<{ className?: string }>;
+    disabled?: boolean;
 };
+
+const data: NavItem[] = [
+    {
+        title: "Steps",
+        url: "/steps",
+        icon: Footprints,
+    },
+    {
+        title: "Calories",
+        url: "/calories",
+        icon: Flame,
+    },
+    {
+        title: "BMI",
+        url: "/bmi",
+        icon: SquareActivity,
+    },
+    {
+        title: "Macros",
+        url: "/macros",
+        icon: Apple,
+    },
+    {
+        title: "Hydratation",
+        url: "/hydration",
+        icon: GlassWater,
+    },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const pathname = usePathname();
+    const { isMobile, setOpenMobile } = useSidebar();
+
     return (
         <Sidebar collapsible="offcanvas" className="border-r-2 border-primary/10 bg-background/95 backdrop-blur-sm" {...props}>
             <SidebarHeader className="p-4 pb-2">
@@ -61,7 +67,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             size="lg"
                             className="hover:bg-transparent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <Link href="/" className="flex items-center gap-3 group">
+                            <Link
+                                onClick={() => {
+                                    if (isMobile) {
+                                        setOpenMobile(false);
+                                    }
+                                }}
+                                href="/"
+                                className="flex items-center gap-3 group"
+                            >
                                 <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all group-hover:bg-primary/20 group-hover:scale-105">
                                     <Flame className="size-6 fill-primary/20" />
                                 </div>
@@ -81,7 +95,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarGroup>
                     <SidebarGroupContent>
                         <SidebarMenu className="gap-2">
-                            {data.navMain.map((item) => {
+                            {data.map((item) => {
                                 const isActive = pathname === item.url;
                                 return (
                                     <SidebarMenuItem key={item.title}>
@@ -95,6 +109,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         >
                                             <Link
                                                 href={item.url}
+                                                onClick={() => {
+                                                    if (isMobile) {
+                                                        setOpenMobile(false);
+                                                    }
+                                                }}
                                                 className={cn("flex gap-4 items-center px-4", item.disabled && "opacity-50 pointer-events-none")}
                                             >
                                                 {item.icon && (
@@ -124,7 +143,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 asChild
                                 className="w-full text-left h-auto py-2 px-2 hover:bg-background hover:shadow-sm transition-all rounded-lg"
                             >
-                                <Link href="/profile" className="flex items-center gap-3">
+                                <Link
+                                    href="/profile"
+                                    onClick={() => {
+                                        if (isMobile) {
+                                            setOpenMobile(false);
+                                        }
+                                    }}
+                                    className="flex items-center gap-3"
+                                >
                                     <div className="flex items-center justify-center bg-background p-1.5 rounded-full ring-1 ring-border text-primary/80">
                                         <CircleUser className="size-4" />
                                     </div>
@@ -136,6 +163,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
+                </div>
+                <div className="text-xs text-center">Fit Tracker v1.0.0</div>
+                <div className="text-xs text-center">
+                    © {new Date().getFullYear()}{" "}
+                    <Link className="text-primary hover:underline" href="https://www.alexandre-artisien.fr">
+                        Alexanndre Artisien
+                    </Link>
                 </div>
             </SidebarFooter>
         </Sidebar>

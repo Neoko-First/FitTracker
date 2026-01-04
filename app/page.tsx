@@ -26,15 +26,17 @@ const apps = [
     },
     {
         title: "Macros",
+        description: "Calculez vos besoins en Protéines, Lipides et Glucides selon votre objectif.",
         url: "/macros",
         icon: Apple,
-        disabled: true,
+        disabled: false,
     },
     {
         title: "Hydratation",
+        description: "Estimez vos besoins quotidiens en eau.",
         url: "/hydration",
         icon: GlassWater,
-        disabled: true,
+        disabled: false,
     },
 ];
 
