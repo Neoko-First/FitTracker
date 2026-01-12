@@ -40,6 +40,11 @@ export const metadata: Metadata = {
     // Nom de l'application, utilisé dans le manifest ou pour l'Apple Web App
     applicationName: title,
 
+    // Canonical URL
+    alternates: {
+        canonical: url,
+    },
+
     // Liste des auteurs du site — utile pour créditer une agence ou une équipe
     authors: [
         {
