@@ -1,4 +1,12 @@
+import { Metadata } from "next";
 import ProfileForm from "./form";
+import { createMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createMetadata({
+    title: "Profil",
+    description: "Gestion de votre profil utilisateur.",
+    path: "/profile",
+});
 
 export default function ProfilePage() {
     return (

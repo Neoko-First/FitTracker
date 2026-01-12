@@ -2,10 +2,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/toggle-mode";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -17,65 +18,106 @@ const geistMono = Geist_Mono({
     subsets: ["latin"],
 });
 
-const title = "Fit Tracker";
-const description = "Tracker vos forme est un jeu d'enfant";
-const url = "https://fit-tracker-mauve.vercel.app";
+const title = process.env.NEXT_PUBLIC_APP_NAME || "Fit Tracker";
+const description = process.env.NEXT_PUBLIC_APP_DESCRIPTION || "Tracker vos forme est un jeu d'enfant";
+const url = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const indexable = process.env.NEXT_PUBLIC_WEB_INDEX === "true";
 
 export const metadata: Metadata = {
+    // URL de base utilisée pour générer les URLs relatives dans les balises meta (ex : canonical)
     metadataBase: new URL(url),
+
+    // Titre par défaut et template de titre pour les pages
+    // Exemple : "Page Contact - Pierres d'Histoire"
     title: {
         default: title,
         template: `%s - ${title}`,
     },
+
+    // Description générique du site, utilisée dans <meta name="description">
     description: description,
+
+    // Nom de l'application, utilisé dans le manifest ou pour l'Apple Web App
     applicationName: title,
+
+    // Liste des auteurs du site — utile pour créditer une agence ou une équipe
     authors: [
         {
             url: "https://www.alexandre-artisien.fr",
             name: "Alexandre Artisien",
         },
     ],
-    themeColor: "#34D399",
+
+    // Nom du framework ou moteur utilisé pour générer le site (info purement informative)
     generator: "Next.js",
+
+    // Créateur du **contenu intellectuel** (par défaut), utilisé par certains moteurs pour afficher la provenance
     creator: "Alexandre Artisien",
+
+    // Éditeur du site au sens de "celui qui publie le contenu" (devrait plutôt être "Pierres d'Histoire")
     publisher: "Alexandre Artisien",
+
+    // Configuration PWA pour Safari iOS : active le mode "web app plein écran"
     appleWebApp: {
         capable: true,
         title: title,
         statusBarStyle: "default",
     },
+
+    icons: {
+        icon: "/favicon.ico",
+        apple: "/apple-icon.png",
+    },
+
+    // Données OpenGraph pour les réseaux sociaux (ex : Facebook, LinkedIn)
     openGraph: {
+        // Titre OG par défaut + template
         title: {
             default: title,
             template: `%s`,
         },
+        // Description affichée lors d’un partage sur réseaux sociaux
         description: description,
+        // URL canonique du site
         url: url,
+        // Langues alternatives
+        alternateLocale: ["fr"],
+        // Nom du site
         siteName: title,
-        locale: "fr_FR",
+        // Type de contenu : "website", "article", "product", etc.
         type: "website",
-        images: "banner.png",
+        // Image par défaut pour les partages sociaux
+        images: "/banner.png",
     },
+
+    // Balises Twitter Card
     twitter: {
         title: {
             default: title,
             template: `%s`,
         },
         description: description,
-        card: "summary_large_image",
-        images: "banner.png",
+        card: "summary_large_image", // grand visuel dans l’aperçu Twitter
+        images: "/banner.png", // image utilisée pour la carte
     },
+
+    // Instructions pour les robots d’indexation (SEO)
     robots: {
-        index: false,
-        follow: false,
+        index: indexable, // true = autorise l’indexation
+        follow: indexable, // true = autorise le crawl des liens
         googleBot: {
-            index: false,
-            follow: false,
-            "max-video-preview": -1,
-            "max-image-preview": "large",
-            "max-snippet": -1,
+            index: indexable,
+            follow: indexable,
+            "max-video-preview": -1, // -1 = pas de limite
+            "max-image-preview": "large", // autorise un aperçu large des images
+            "max-snippet": -1, // pas de limite de longueur pour les extraits
         },
     },
+};
+
+export const viewport: Viewport = {
+    themeColor: "#34D399",
+    colorScheme: "light dark",
 };
 
 export default function RootLayout({
@@ -86,6 +128,7 @@ export default function RootLayout({
     return (
         <html lang="fr" suppressHydrationWarning>
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+                <Analytics />
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
                     <SidebarProvider>
                         <AppSidebar />
