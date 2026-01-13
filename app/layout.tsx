@@ -69,6 +69,7 @@ export const metadata: Metadata = {
         statusBarStyle: "default",
     },
 
+    // Icônes utilisées pour les applications web
     icons: {
         icon: "/favicon.ico",
         apple: "/apple-icon.png",

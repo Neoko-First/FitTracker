@@ -29,6 +29,13 @@ export default function manifest(): MetadataRoute.Manifest {
                 purpose: "maskable",
             },
         ],
+        screenshots: [
+            {
+                src: "screenshot.webp",
+                sizes: "1024x540",
+                type: "image/webp",
+            },
+        ],
         id: title,
         categories: ["utilities"],
         dir: "ltr",
