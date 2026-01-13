@@ -19,7 +19,9 @@ const geistMono = Geist_Mono({
 });
 
 const title = process.env.NEXT_PUBLIC_APP_NAME || "Fit Tracker";
-const description = process.env.NEXT_PUBLIC_APP_DESCRIPTION || "Tracker vos forme est un jeu d'enfant";
+const description =
+    process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
+    "Calculez vos calories, macros, IMC, besoins énergétiques, pas, allure et hydratation avec Fit Tracker, une application claire et fiable pour mieux comprendre et suivre vos objectifs forme.";
 const url = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 const indexable = process.env.NEXT_PUBLIC_WEB_INDEX === "true";
 

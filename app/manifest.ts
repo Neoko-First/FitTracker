@@ -3,7 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
     const title = "Fit Tracker";
     const short_name = "Fit Tracker";
-    const description = "Tracker vos forme est un jeu d'enfant";
+    const description =
+        "Calculez vos calories, macros, IMC, besoins énergétiques, pas, allure et hydratation avec Fit Tracker, une application claire et fiable pour mieux comprendre et suivre vos objectifs forme.";
 
     return {
         name: title,

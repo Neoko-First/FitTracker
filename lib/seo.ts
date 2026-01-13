@@ -10,7 +10,9 @@ interface GenerateMetadataParams {
 
 const siteName = process.env.NEXT_PUBLIC_APP_NAME || "Fit Tracker";
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-const siteDescription = process.env.NEXT_PUBLIC_APP_DESCRIPTION || "Tracker vos forme est un jeu d'enfant";
+const siteDescription =
+    process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
+    "Calculez vos calories, macros, IMC, besoins énergétiques, pas, allure et hydratation avec Fit Tracker, une application claire et fiable pour mieux comprendre et suivre vos objectifs forme.";
 
 export function createMetadata({ title, description, path, robots = false, image }: GenerateMetadataParams): Metadata {
     const allowRobots = robots && process.env.NEXT_PUBLIC_WEB_INDEX === "true" ? true : false;
