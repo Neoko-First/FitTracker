@@ -2,11 +2,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/toggle-mode";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -45,6 +45,11 @@ export const metadata: Metadata = {
     // Canonical URL
     alternates: {
         canonical: url,
+    },
+    
+    // Google search console
+    other: {
+        "google-site-verification": "0isr83HVlUdVblRq7sQGMMyidAD7o_Uyh5shhwM6BEI",
     },
 
     // Liste des auteurs du site — utile pour créditer une agence ou une équipe
