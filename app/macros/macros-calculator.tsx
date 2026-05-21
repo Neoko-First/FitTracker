@@ -176,7 +176,7 @@ export default function MacrosCalculator() {
         </CardContent>
       </Card>
 
-      {/* Col 2-3, Row 1 : résultats macros */}
+      {/* Col 2-3, Row 1 : résultats macross */}
       <div className="lg:col-span-2">
         {error ? (
           <Card className="border-destructive/50 bg-destructive/5 h-full flex flex-col items-center justify-center p-8 text-center">
