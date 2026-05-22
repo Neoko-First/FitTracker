@@ -6,6 +6,7 @@ export const metadata: Metadata = createMetadata({
     title: "Profil",
     description: "Gestion de votre profil utilisateur.",
     path: "/profile",
+    robots: false,
 });
 
 export default function ProfilePage() {
